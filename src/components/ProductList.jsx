@@ -29,7 +29,7 @@ const ProductList = ({ products, handleEdit, handleDelete }) => {
                             <Button variant="primary" onClick={() => handleEdit(product)}>
                                 Edit
                             </Button>
-                            <Button variant="danger" onClick={() => handleDelete(product.id)}>
+                            <Button variant="danger" className="ms-2" onClick={() => handleDelete(product.id)}>
                                 Delete
                             </Button>
                         </td>
