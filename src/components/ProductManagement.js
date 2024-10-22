@@ -1,34 +1,40 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { getProducts, addProduct, updateProduct, deleteProduct } from '../api/ProductService';
 import ProductForm from './ProductForm';
 import ProductList from './ProductList';
+import { Alert, Form, Button, InputGroup, Row, Col, Modal } from 'react-bootstrap';
 
 const ProductManagement = () => {
     const [products, setProducts] = useState([]);
-    const [filteredProducts, setFilteredProducts] = useState([]);
     const [formData, setFormData] = useState({ barcode: '', name: '', description: '', price: '', quantity: '', category: '' });
     const [editMode, setEditMode] = useState(false);
     const [currentProductId, setCurrentProductId] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [successMessage, setSuccessMessage] = useState('');
-    const [searchTerm, setSearchTerm] = useState('');
+    const [message, setMessage] = useState('');
+    const [error, setError] = useState('');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [showModal, setShowModal] = useState(false); // Modal visibility state
+    const [selectedProduct, setSelectedProduct] = useState(null); // Product to display in modal
 
-    useEffect(() => {
-        fetchProducts();
-    }, []);
-
-    const fetchProducts = async () => {
-        setLoading(true);
+    const fetchProducts = useCallback(async () => {
         try {
             const response = await getProducts();
             setProducts(response.data);
-            setFilteredProducts(response.data); // Initialize filteredProducts
-        } catch (error) {
-            console.error('Error fetching products:', error);
-            alert('Failed to fetch products.');
-        } finally {
-            setLoading(false);
+        } catch (err) {
+            setError('Failed to fetch products. Please try again later.');
+            clearMessage();
+            console.error('Error fetching products:', err);
         }
+    }, []);
+
+    useEffect(() => {
+        fetchProducts();
+    }, [fetchProducts]);
+
+    const clearMessage = () => {
+        setTimeout(() => {
+            setMessage('');
+            setError('');
+        }, 5000); // Clear message after 5 seconds
     };
 
     const handleInputChange = (e) => {
@@ -37,53 +43,52 @@ const ProductManagement = () => {
     };
 
     const handleSearchChange = (e) => {
-        setSearchTerm(e.target.value);
+        setSearchQuery(e.target.value);
     };
 
     const handleSearch = () => {
-        // Filter products based on the search term
-        if (searchTerm) {
-            const results = products.filter(product =>
-                product.name.toLowerCase().includes(searchTerm.toLowerCase())
-            );
-            setFilteredProducts(results);
-        } else {
-            setFilteredProducts(products); // Reset filtered products if search term is empty
-        }
+        const foundProduct = products.find((product) =>
+            product.name.toLowerCase().includes(searchQuery.toLowerCase())
+        );
 
-        // Clear the search input after searching
-        setSearchTerm('');
+        if (foundProduct) {
+            setSelectedProduct(foundProduct); // Store product details for modal
+            setShowModal(true); // Open modal
+            setMessage('');
+        } else {
+            setMessage(`Product "${searchQuery}" does not exist.`);
+        }
+    };
+
+    const handleCloseModal = () => {
+        setShowModal(false);
+        setSelectedProduct(null);
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
-        // Basic validation
-        if (!formData.name || !formData.price || !formData.quantity) {
-            alert('All fields are required.');
-            return;
-        }
+
         if (formData.price < 0 || formData.quantity < 0) {
-            alert('Price and quantity must be non-negative.');
+            setError('Price and quantity must be non-negative.');
+            clearMessage();
             return;
         }
 
-        setLoading(true);
         try {
             if (editMode) {
                 await updateProduct(currentProductId, formData);
-                setSuccessMessage('Product updated successfully!');
+                setMessage('Product updated successfully!');
             } else {
                 await addProduct(formData);
-                setSuccessMessage('Product added successfully!');
+                setMessage('Product created successfully!');
             }
             fetchProducts();
             resetForm();
-        } catch (error) {
-            console.error('Error saving product:', error.response ? error.response.data : error.message);
-            alert('An error occurred while saving the product.');
-        } finally {
-            setLoading(false);
+            clearMessage();
+        } catch (err) {
+            setError(err.response?.data.message || 'An error occurred while saving the product. Please try again.');
+            clearMessage();
+            console.error('Error saving product:', err);
         }
     };
 
@@ -95,16 +100,15 @@ const ProductManagement = () => {
 
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this product?')) {
-            setLoading(true);
             try {
                 await deleteProduct(id);
+                setMessage('Product deleted successfully!');
                 fetchProducts();
-                alert('Product deleted successfully!');
-            } catch (error) {
-                console.error('Error deleting product:', error.response ? error.response.data : error.message);
-                alert('An error occurred while deleting the product.');
-            } finally {
-                setLoading(false);
+                clearMessage();
+            } catch (err) {
+                setError('An error occurred while deleting the product. Please try again.');
+                clearMessage();
+                console.error('Error deleting product:', err);
             }
         }
     };
@@ -113,26 +117,32 @@ const ProductManagement = () => {
         setFormData({ barcode: '', name: '', description: '', price: '', quantity: '', category: '' });
         setEditMode(false);
         setCurrentProductId(null);
-        setSuccessMessage('');
-        setSearchTerm(''); // Reset search term
-        setFilteredProducts(products); // Reset filtered products
     };
 
     return (
         <div>
             <h2>Product Management</h2>
-            {loading && <p>Loading...</p>}
-            {successMessage && <p>{successMessage}</p>}
-            <div style={{ marginBottom: '20px' }}>
-                <input
-                    type="text"
-                    placeholder="Search by product name..."
-                    value={searchTerm}
-                    onChange={handleSearchChange}
-                    style={{ padding: '10px', width: '300px', marginRight: '10px' }} // Styling for the search input
-                />
-                <button onClick={handleSearch} style={{ padding: '10px' }}>Search</button>
-            </div>
+            {error && <Alert variant="danger">{error}</Alert>} {/* Display error message */}
+            {message && <Alert variant="warning">{message}</Alert>} {/* Display search not found message */}
+
+            {/* Smaller Search Bar */}
+            <Row className="justify-content-center mb-3">
+                <Col xs={8} sm={6} md={4}>
+                    <InputGroup>
+                        <Form.Control
+                            type="text"
+                            placeholder="Search by product name"
+                            value={searchQuery}
+                            onChange={handleSearchChange}
+                            size="sm"
+                        />
+                        <Button variant="primary" size="sm" onClick={handleSearch}>
+                            Search
+                        </Button>
+                    </InputGroup>
+                </Col>
+            </Row>
+
             <ProductForm 
                 formData={formData} 
                 handleInputChange={handleInputChange} 
@@ -140,11 +150,36 @@ const ProductManagement = () => {
                 editMode={editMode} 
                 resetForm={resetForm} 
             />
+
             <ProductList 
-                products={filteredProducts} // Use filteredProducts for display
+                products={products} 
                 handleEdit={handleEdit} 
                 handleDelete={handleDelete} 
             />
+
+            {/* Product Details Modal */}
+            <Modal show={showModal} onHide={handleCloseModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Product Details</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {selectedProduct && (
+                        <div>
+                            <p><strong>Barcode:</strong> {selectedProduct.barcode}</p>
+                            <p><strong>Name:</strong> {selectedProduct.name}</p>
+                            <p><strong>Description:</strong> {selectedProduct.description}</p>
+                            <p><strong>Price:</strong> ${selectedProduct.price}</p>
+                            <p><strong>Quantity:</strong> {selectedProduct.quantity}</p>
+                            <p><strong>Category:</strong> {selectedProduct.category}</p>
+                        </div>
+                    )}
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCloseModal}>
+                        Close
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </div>
     );
 };
