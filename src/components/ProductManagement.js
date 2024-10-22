@@ -101,10 +101,10 @@ const ProductManagement = () => {
 
             {/* Display buttons to toggle views */}
             <div style={{ marginLeft: '1150px' }}> {/* Moved buttons slightly to the right */}
-                <Button onClick={() => handleSwitchView('dashboard')} variant="primary" style={{ marginRight: '10px' }}>
+                <Button onClick={() => handleSwitchView('dashboard')} variant="dark" style={{ marginRight: '10px' }}>
                     Product List
                 </Button>
-                <Button onClick={() => handleSwitchView('add')} variant="success" style={{ marginRight: '10px' }}>
+                <Button onClick={() => handleSwitchView('add')} variant="dark" style={{ marginRight: '10px' }}>
                     Add Product
                 </Button>
             </div>
