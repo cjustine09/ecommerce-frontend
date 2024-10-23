@@ -4,23 +4,26 @@ import AddProduct from './AddProduct';
 import EditProduct from './EditProduct';
 import Dashboard from './Dashboard';
 import { Alert, Button } from 'react-bootstrap';
+import axios from 'axios';
 
 const ProductManagement = () => {
-    const [products, setProducts] = useState([]);
-    const [filteredProducts, setFilteredProducts] = useState([]);
+    const [products, setProducts] = useState([]);  // All products
+    const [filteredProducts, setFilteredProducts] = useState([]);  // Displayed products (filtered by search)
     const [formData, setFormData] = useState({ barcode: '', name: '', description: '', price: '', quantity: '', category: '' });
     const [editMode, setEditMode] = useState(false);
     const [currentProductId, setCurrentProductId] = useState(null);
     const [message, setMessage] = useState('');
-    const [error, setError] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
     const [view, setView] = useState('dashboard'); // To manage the current view ('dashboard', 'add', 'edit')
+    const [loading, setLoading] = useState(false);  // Loading state
+    const [error, setError] = useState(null);  // Error state
 
+    // Fetch products from the API
     const fetchProducts = useCallback(async () => {
         try {
             const response = await getProducts();
             setProducts(response.data);
-            setFilteredProducts(response.data); // Initialize filteredProducts with fetched products
+            setFilteredProducts(response.data); // Initialize filteredProducts with all products
         } catch (err) {
             setError('Failed to fetch products. Please try again later.');
             clearMessage();
@@ -32,6 +35,7 @@ const ProductManagement = () => {
         fetchProducts();
     }, [fetchProducts]);
 
+    // Clear messages and errors after a timeout
     const clearMessage = () => {
         setTimeout(() => {
             setMessage('');
@@ -39,24 +43,32 @@ const ProductManagement = () => {
         }, 5000); // Clear message after 5 seconds
     };
 
+    // Handle search input change
     const handleSearchChange = (e) => {
         setSearchQuery(e.target.value);
     };
 
-    const handleSearch = () => {
-        if (searchQuery) {
-            const results = products.filter((product) =>
-                product.name.toLowerCase().includes(searchQuery.toLowerCase())||
-                product.category.toLowerCase().includes(searchQuery.toLowerCase())
-            );
-            setFilteredProducts(results); // Update filtered products with search results
-        } else {
-            setFilteredProducts(products); // Reset to all products if search input is empty
-        }
+    // Handle search form submission
+    const handleSearch = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError(null);
 
-        setSearchQuery('');
+        try {
+            const response = await axios.get('http://localhost:8000/api/products/search', {
+                params: { query: searchQuery }  // Send query to API
+            });
+
+            setFilteredProducts(response.data);  // Update filtered products with search results
+            setLoading(false);
+        } catch (error) {
+            console.error('Error fetching search results:', error);
+            setError('Failed to fetch search results.');
+            setLoading(false);
+        }
     };
 
+    // Handle product edit
     const handleEdit = (product) => {
         setFormData(product);
         setEditMode(true);
@@ -64,20 +76,22 @@ const ProductManagement = () => {
         setView('edit'); // Switch to the edit view
     };
 
+    // Reset form and search query
     const resetForm = () => {
         setFormData({ barcode: '', name: '', description: '', price: '', quantity: '', category: '' });
         setEditMode(false);
         setCurrentProductId(null);
         setSearchQuery(''); // Reset search term
-        setFilteredProducts(products); // Reset filtered products
+        setFilteredProducts(products); // Reset filtered products to show all
     };
 
+    // Handle product deletion
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this product?')) {
             try {
                 await deleteProduct(id);
                 setMessage('Product deleted successfully!');
-                fetchProducts();
+                fetchProducts();  // Refresh the products after deletion
                 clearMessage();
             } catch (err) {
                 setError('An error occurred while deleting the product. Please try again.');
@@ -112,12 +126,13 @@ const ProductManagement = () => {
             {/* Conditionally render the components based on the current view */}
             {view === 'dashboard' && (
                 <Dashboard
-                    products={filteredProducts}
+                    products={filteredProducts}  // Use filtered products for the dashboard
                     handleSearchChange={handleSearchChange}
                     handleSearch={handleSearch}
                     handleEdit={handleEdit}
                     handleDelete={handleDelete}
                     searchQuery={searchQuery}
+                    loading={loading}
                 />
             )}
 
