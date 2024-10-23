@@ -1,8 +1,10 @@
-import React, { useState } from 'react'; // Added useState import
+import React from 'react'; // Added useState import
 import { Form, Button, Card, Container} from 'react-bootstrap';
+import Barcode from 'react-barcode';
 
-const EditProduct = ({ formData, setFormData, updateProduct, currentProductId, fetchProducts, setMessage, setError, clearMessage }) => {
-    const [view, setView] = useState('dashboard');
+const EditProduct = ({ formData, setFormData, updateProduct, currentProductId, 
+                       fetchProducts, setMessage, setError, clearMessage }) => {
+    
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -22,15 +24,6 @@ const EditProduct = ({ formData, setFormData, updateProduct, currentProductId, f
         }
     };
 
-    const resetForm = () => {
-        setFormData({ barcode: '', name: '', description: '', price: '', quantity: '', category: '' });
-    };
-
-    const handleSwitchView = (viewName) => {
-        setView(viewName); // Switch between 'dashboard', 'add', and 'edit'
-        resetForm();
-    };
-
     return (
         <Container className="d-flex justify-content-center mt-5"> {/* Center the card */}
         <Card className="w-50"> {/* Set card width as needed */}
@@ -38,16 +31,16 @@ const EditProduct = ({ formData, setFormData, updateProduct, currentProductId, f
                 <Card.Title>Edit Product</Card.Title>
             <Form onSubmit={handleSubmit}>
                 {/* Barcode */}
-                <Form.Group controlId="formBarcode">
-                    <Form.Label>Barcode</Form.Label>
-                    <Form.Control
-                        type="text"
-                        name="barcode"
-                        value={formData.barcode}
-                        onChange={handleInputChange}
-                        placeholder="Enter product barcode"
+                <div className="mb-3">
+                    <Form.Label>Barcode:</Form.Label>
+                        {/* Render the barcode directly without an input field */}
+                    <Barcode 
+                        value={formData.barcode} 
+                        width={1}    // Adjust the width of each bar
+                        height={50}  // Adjust the height of the barcode
+                        displayValue={true} // Hides the value below the barcode
                     />
-                </Form.Group>
+                </div>
 
                 {/* Name */}
                 <Form.Group controlId="formName">
@@ -109,9 +102,11 @@ const EditProduct = ({ formData, setFormData, updateProduct, currentProductId, f
                     />
                 </Form.Group>
 
-                <Button variant="primary" type="submit">
-                    Update Product
-                </Button>
+                <div className="mt-3">
+                    <Button variant="success" type="submit">
+                        Add 
+                    </Button>
+                </div>
             </Form>
         </Card.Body>
         </Card>

@@ -3,7 +3,7 @@ import { getProducts, addProduct, updateProduct, deleteProduct } from '../api/Pr
 import AddProduct from './AddProduct';
 import EditProduct from './EditProduct';
 import Dashboard from './Dashboard';
-import { Alert, Button } from 'react-bootstrap';
+import { Alert, Button, Modal } from 'react-bootstrap';
 import axios from 'axios';
 
 const ProductManagement = () => {
@@ -17,6 +17,7 @@ const ProductManagement = () => {
     const [view, setView] = useState('dashboard'); // To manage the current view ('dashboard', 'add', 'edit')
     const [loading, setLoading] = useState(false);  // Loading state
     const [error, setError] = useState(null);  // Error state
+    const [showDeleteModal, setShowDeleteModal] = useState(false); // State for delete confirmation modal
 
     // Fetch products from the API
     const fetchProducts = useCallback(async () => {
@@ -85,20 +86,36 @@ const ProductManagement = () => {
         setFilteredProducts(products); // Reset filtered products to show all
     };
 
-    // Handle product deletion
-    const handleDelete = async (id) => {
-        if (window.confirm('Are you sure you want to delete this product?')) {
-            try {
-                await deleteProduct(id);
-                setMessage('Product deleted successfully!');
-                fetchProducts();  // Refresh the products after deletion
-                clearMessage();
-            } catch (err) {
-                setError('An error occurred while deleting the product. Please try again.');
-                clearMessage();
-                console.error('Error deleting product:', err);
-            }
+    // State for handling deletion
+    const [deletionId, setDeletionId] = useState(null); // State to store product ID to be deleted
+
+    // Handle product deletion (show modal)
+    const handleDelete = (id) => {
+        setDeletionId(id); // Store the ID of the product to be deleted
+        setShowDeleteModal(true); // Show the delete confirmation modal
+    };
+
+    // Confirm product deletion
+    const confirmDelete = async () => {
+        try {
+            await deleteProduct(deletionId);
+            setMessage('Product Deleted uccessfully!');
+            fetchProducts();  // Refresh the products after deletion
+            clearMessage();
+        } catch (err) {
+            setError('An error occurred while deleting the product. Please try again.');
+            clearMessage();
+            console.error('Error deleting product:', err);
+        } finally {
+            setShowDeleteModal(false); // Close the modal after operation
+            setDeletionId(null); // Reset deletionId
         }
+    };
+
+    // Close modal
+    const handleCloseDeleteModal = () => {
+        setShowDeleteModal(false);
+        setDeletionId(null); // Reset deletionId when closing the modal
     };
 
     // Switch view handler
@@ -160,6 +177,22 @@ const ProductManagement = () => {
                     clearMessage={clearMessage}
                 />
             )}
+
+            {/* Delete Confirmation Modal */}
+            <Modal show={showDeleteModal} onHide={handleCloseDeleteModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirm Deletion</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>Are you sure you want to delete this product?</Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCloseDeleteModal}>
+                        Cancel
+                    </Button>
+                    <Button variant="danger" onClick={confirmDelete}>
+                        Delete
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </div>
     );
 };

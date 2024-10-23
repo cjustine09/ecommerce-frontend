@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
-import { Form, Button, Card, Container } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Form, Button, Card, Container, Modal } from 'react-bootstrap';
 import Barcode from 'react-barcode'; // Import the Barcode component
 
 const AddProduct = ({ formData, setFormData, addProduct, fetchProducts, setMessage, setError, clearMessage }) => {
+    const [showModal, setShowModal] = useState(false);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -18,22 +19,31 @@ const AddProduct = ({ formData, setFormData, addProduct, fetchProducts, setMessa
         // Generate a new barcode when the component mounts
         const newBarcode = generateBarcode();
         setFormData((prevData) => ({ ...prevData, barcode: newBarcode }));
-    }, []); // Empty dependency array means this runs once on mount
+    }, [setFormData]); // Empty dependency array means this runs once on mount
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
+        setShowModal(true); // Show the confirmation modal
+    };
 
+    const handleConfirmAdd = async () => {
         try {
             await addProduct(formData);
-            setMessage('Product created successfully!');
+            setMessage('Product Added Successfully!');
             fetchProducts();
-            setFormData({ name: '', description: '', price: '', quantity: '', category: '', barcode: '' }); // Clear the form
+            // Optionally clear the form after successful addition
+            setFormData({ name: '', description: '', price: '', quantity: '', category: '', barcode: '' });
             clearMessage();
         } catch (err) {
             setError('An error occurred while adding the product.');
             clearMessage();
+        } finally {
+            setShowModal(false); // Close the modal after the operation
         }
     };
+
+    const handleClose = () => setShowModal(false); // Close the modal
+
 
     return (
         <Container className="d-flex justify-content-center mt-5">
@@ -42,26 +52,17 @@ const AddProduct = ({ formData, setFormData, addProduct, fetchProducts, setMessa
                     <Card.Title>Add Product</Card.Title>
                     <Form onSubmit={handleSubmit}>
                         {/* Barcode Display */}
-                        <Form.Group controlId="formBarcode">
-                            <Form.Label>Barcode</Form.Label>
-                            <Form.Control
-                                type="text"
-                                name="barcode"
-                                value={formData.barcode} // Display the generated barcode
-                                readOnly
+                        <div className="mb-3">
+                            <Form.Label>Barcode:</Form.Label>
+                            {/* Render the barcode directly without an input field */}
+                            <Barcode 
+                                value={formData.barcode} 
+                                width={1}    // Adjust the width of each bar
+                                height={50}  // Adjust the height of the barcode
+                                displayValue={true} // Hides the value below the barcode
                             />
-                            {/* Render the barcode if the barcode is generated */}
-                            {formData.barcode && (
-                                <div className="mt-3">
-                                    <Barcode 
-                                        value={formData.barcode} 
-                                        width={1}    // Adjust the width of each bar
-                                        height={50}  // Adjust the height of the barcode
-                                        displayValue={false} // Hides the value below the barcode
-                                    />
-                                </div>
-                            )}
-                        </Form.Group>
+                        </div>
+
 
                         {/* Other fields */}
                         <Form.Group controlId="formName">
@@ -124,12 +125,30 @@ const AddProduct = ({ formData, setFormData, addProduct, fetchProducts, setMessa
                             />
                         </Form.Group>
 
-                        <Button variant="success" type="submit">
-                            Add Product
-                        </Button>
+                        <div className="mt-3">
+                            <Button variant="success" type="submit">
+                                Add 
+                            </Button>
+                        </div>
                     </Form>
                 </Card.Body>
             </Card>
+
+            <Modal show={showModal} onHide={handleClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirm Add Product</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>Are you sure you want to add this product?</Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleClose}>
+                            Cancel
+                    </Button>
+                    <Button variant="primary" onClick={handleConfirmAdd}>
+                            Add
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
         </Container>
     );
 };
