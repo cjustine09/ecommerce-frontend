@@ -65,6 +65,11 @@ function LoginForm() {
             <Card className="bg-light text-dark shadow-lg" style={{ width: '600px', borderRadius: '15px', backgroundColor: 'rgba(255, 255, 255, 0.7)'}}>
             <h1 className='text-center pt-5 font-weight-bold'>ADMIN LOGIN</h1>
                 <Card.Body className='p-5'>
+                {errorMessage && (
+                        <Alert variant="danger" className="mt-1">
+                            {errorMessage}
+                        </Alert>
+                    )}
                     <Form>
                         <Form.Group controlId="formBasicEmail">
                             <Form.Label className="font-weight-bold">Email address</Form.Label>
@@ -93,11 +98,7 @@ function LoginForm() {
                         </Button>
                     </Form>
 
-                    {errorMessage && (
-                        <Alert variant="danger" className="mt-3">
-                            {errorMessage}
-                        </Alert>
-                    )}
+                    
                 </Card.Body>
             </Card>
         </Container>
