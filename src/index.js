@@ -1,17 +1,23 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
-import 'bootstrap/dist/css/bootstrap.min.css';
+// Importing necessary libraries and components
+import React from 'react'; // Importing React
+import ReactDOM from 'react-dom/client'; // Importing ReactDOM for rendering
+import './index.css'; // Importing custom CSS styles
+import App from './App'; // Importing the main App component
+import reportWebVitals from './reportWebVitals'; // Importing performance measuring tool
+import 'bootstrap/dist/css/bootstrap.min.css'; // Importing Bootstrap CSS for styling
+import { BrowserRouter } from 'react-router-dom'; // Importing BrowserRouter for routing
+
+// Creating a root for the React application
 const root = ReactDOM.createRoot(document.getElementById('root'));
+
+// Rendering the application within React.StrictMode for highlighting potential problems
 root.render(
   <React.StrictMode>
-    <App />
+    <BrowserRouter> {/* Wrapping the App with BrowserRouter for routing capabilities */}
+      <App /> {/* Rendering the main App component */}
+    </BrowserRouter>
   </React.StrictMode>
 );
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+// Measuring performance and logging results
 reportWebVitals();

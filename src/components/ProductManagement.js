@@ -5,26 +5,28 @@ import EditProduct from './EditProduct';
 import Dashboard from './Dashboard';
 import { Alert, Button, Modal } from 'react-bootstrap';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const ProductManagement = () => {
-    const [products, setProducts] = useState([]);  // All products
-    const [filteredProducts, setFilteredProducts] = useState([]);  // Displayed products (filtered by search)
+    const [products, setProducts] = useState([]);
+    const [filteredProducts, setFilteredProducts] = useState([]);
     const [formData, setFormData] = useState({ barcode: '', name: '', description: '', price: '', quantity: '', category: '' });
     const [editMode, setEditMode] = useState(false);
     const [currentProductId, setCurrentProductId] = useState(null);
     const [message, setMessage] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
-    const [view, setView] = useState('dashboard'); // To manage the current view ('dashboard', 'add', 'edit')
-    const [loading, setLoading] = useState(false);  // Loading state
-    const [error, setError] = useState(null);  // Error state
-    const [showDeleteModal, setShowDeleteModal] = useState(false); // State for delete confirmation modal
+    const [view, setView] = useState('dashboard');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
+    const navigate = useNavigate();
 
-    // Fetch products from the API
     const fetchProducts = useCallback(async () => {
         try {
             const response = await getProducts();
             setProducts(response.data);
-            setFilteredProducts(response.data); // Initialize filteredProducts with all products
+            setFilteredProducts(response.data);
         } catch (err) {
             setError('Failed to fetch products. Please try again later.');
             clearMessage();
@@ -36,31 +38,26 @@ const ProductManagement = () => {
         fetchProducts();
     }, [fetchProducts]);
 
-    // Clear messages and errors after a timeout
     const clearMessage = () => {
         setTimeout(() => {
             setMessage('');
             setError('');
-        }, 5000); // Clear message after 5 seconds
+        }, 5000);
     };
 
-    // Handle search input change
     const handleSearchChange = (e) => {
         setSearchQuery(e.target.value);
     };
 
-    // Handle search form submission
     const handleSearch = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
-
         try {
             const response = await axios.get('http://localhost:8000/api/products/search', {
-                params: { query: searchQuery }  // Send query to API
+                params: { query: searchQuery }
             });
-
-            setFilteredProducts(response.data);  // Update filtered products with search results
+            setFilteredProducts(response.data);
             setLoading(false);
         } catch (error) {
             console.error('Error fetching search results:', error);
@@ -69,81 +66,90 @@ const ProductManagement = () => {
         }
     };
 
-    // Handle product edit
     const handleEdit = (product) => {
         setFormData(product);
         setEditMode(true);
         setCurrentProductId(product.id);
-        setView('edit'); // Switch to the edit view
+        setView('edit');
     };
 
-    // Reset form and search query
     const resetForm = () => {
         setFormData({ barcode: '', name: '', description: '', price: '', quantity: '', category: '' });
         setEditMode(false);
         setCurrentProductId(null);
-        setSearchQuery(''); // Reset search term
-        setFilteredProducts(products); // Reset filtered products to show all
+        setSearchQuery('');
+        setFilteredProducts(products);
     };
 
-    // State for handling deletion
-    const [deletionId, setDeletionId] = useState(null); // State to store product ID to be deleted
+    const [deletionId, setDeletionId] = useState(null);
 
-    // Handle product deletion (show modal)
     const handleDelete = (id) => {
-        setDeletionId(id); // Store the ID of the product to be deleted
-        setShowDeleteModal(true); // Show the delete confirmation modal
+        setDeletionId(id);
+        setShowDeleteModal(true);
     };
 
-    // Confirm product deletion
     const confirmDelete = async () => {
         try {
             await deleteProduct(deletionId);
-            setMessage('Product Deleted uccessfully!');
-            fetchProducts();  // Refresh the products after deletion
+            setMessage('Product Deleted Successfully!');
+            fetchProducts();
             clearMessage();
         } catch (err) {
             setError('An error occurred while deleting the product. Please try again.');
             clearMessage();
             console.error('Error deleting product:', err);
         } finally {
-            setShowDeleteModal(false); // Close the modal after operation
-            setDeletionId(null); // Reset deletionId
+            setShowDeleteModal(false);
+            setDeletionId(null);
         }
     };
 
-    // Close modal
     const handleCloseDeleteModal = () => {
         setShowDeleteModal(false);
-        setDeletionId(null); // Reset deletionId when closing the modal
+        setDeletionId(null);
     };
 
-    // Switch view handler
     const handleSwitchView = (viewName) => {
-        setView(viewName); // Switch between 'dashboard', 'add', and 'edit'
+        setView(viewName);
         resetForm();
+    };
+
+    const logOut = () => {
+        setShowLogoutModal(true);
+    }
+
+    const confirmLogout = () => {
+        localStorage.removeItem("user-info");
+        navigate("/");
+        setShowLogoutModal(false);
+    };
+
+    const cancelLogout = () => {
+        setShowLogoutModal(false);
     };
 
     return (
         <div>
-            <h2 style={{ marginLeft: '550px', marginTop: '30px' }}>Product Management</h2> {/* Moved title slightly to the right */}
+            <h2 style={{ marginLeft: '550px', marginTop: '30px' }}>Product Management</h2>
             {error && <Alert variant="danger" style={{ marginLeft: '20px' }}>{error}</Alert>}
             {message && <Alert variant="success" style={{ marginLeft: '20px' }}>{message}</Alert>}
 
-            {/* Display buttons to toggle views */}
-            <div style={{ marginLeft: '1150px' }}> {/* Moved buttons slightly to the right */}
+            {/* Display buttons side by side */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginRight: '200px', marginBottom: '20px' }}>
                 <Button onClick={() => handleSwitchView('dashboard')} variant="dark" style={{ marginRight: '10px' }}>
                     Product List
                 </Button>
                 <Button onClick={() => handleSwitchView('add')} variant="dark" style={{ marginRight: '10px' }}>
                     Add Product
                 </Button>
+                <Button onClick={logOut} variant="success">
+                    Logout
+                </Button>
             </div>
 
-            {/* Conditionally render the components based on the current view */}
             {view === 'dashboard' && (
                 <Dashboard
-                    products={filteredProducts}  // Use filtered products for the dashboard
+                    products={filteredProducts}
                     handleSearchChange={handleSearchChange}
                     handleSearch={handleSearch}
                     handleEdit={handleEdit}
@@ -177,6 +183,22 @@ const ProductManagement = () => {
                     clearMessage={clearMessage}
                 />
             )}
+
+            {/* Logout Confirmation Modal */}
+            <Modal show={showLogoutModal} onHide={cancelLogout}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirm Logout</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>Are you sure you want to logout?</Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={cancelLogout}>
+                        Cancel
+                    </Button>
+                    <Button variant="success" onClick={confirmLogout}>
+                        Logout
+                    </Button>
+                </Modal.Footer>
+            </Modal>
 
             {/* Delete Confirmation Modal */}
             <Modal show={showDeleteModal} onHide={handleCloseDeleteModal}>
