@@ -1,6 +1,7 @@
 // ProductList.js
 import React from 'react';
 import { Table, Button } from 'react-bootstrap';
+import Barcode from 'react-barcode'; // Import barcode component
 
 const ProductList = ({ products, handleEdit, handleDelete }) => {
     return (
@@ -19,7 +20,14 @@ const ProductList = ({ products, handleEdit, handleDelete }) => {
             <tbody>
                 {products.map((product) => (
                     <tr key={product.id}>
-                        <td>{product.barcode}</td>
+                        <td>
+                            <Barcode 
+                                value={product.barcode} 
+                                width={1}   // Adjust the width (default is 2)
+                                height={30} // Adjust the height (default is 100)
+                                displayValue={true} // Optionally hide the text value
+                            />
+                        </td>
                         <td>{product.name}</td>
                         <td>{product.description}</td>
                         <td>{product.price}</td>

@@ -1,36 +1,37 @@
-import React from 'react';
-import { Form, Button, Card, Container, Alert } from 'react-bootstrap';
+import React, { useEffect } from 'react';
+import { Form, Button, Card, Container } from 'react-bootstrap';
+import Barcode from 'react-barcode'; // Import the Barcode component
 
 const AddProduct = ({ formData, setFormData, addProduct, fetchProducts, setMessage, setError, clearMessage }) => {
-    const [loading, setLoading] = React.useState(false); // Loading state for the button
-    const [formError, setFormError] = React.useState('');
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
-        setFormError(''); // Clear form error on input change
     };
+
+    const generateBarcode = () => {
+        // Generate a random barcode (you can customize this logic)
+        return Math.floor(Math.random() * 1000000000).toString();
+    };
+
+    useEffect(() => {
+        // Generate a new barcode when the component mounts
+        const newBarcode = generateBarcode();
+        setFormData((prevData) => ({ ...prevData, barcode: newBarcode }));
+    }, []); // Empty dependency array means this runs once on mount
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
-        // Simple validation
-        if (!formData.barcode || !formData.name || !formData.price || !formData.quantity || !formData.category) {
-            setFormError('All fields are required.');
-            return;
-        }
 
-        setLoading(true); // Set loading state
         try {
             await addProduct(formData);
             setMessage('Product created successfully!');
-            await fetchProducts(); // Wait for fetch to complete
+            fetchProducts();
+            setFormData({ name: '', description: '', price: '', quantity: '', category: '', barcode: '' }); // Clear the form
             clearMessage();
-            setLoading(false);
         } catch (err) {
             setError('An error occurred while adding the product.');
             clearMessage();
-            setLoading(false);
         }
     };
 
@@ -39,22 +40,30 @@ const AddProduct = ({ formData, setFormData, addProduct, fetchProducts, setMessa
             <Card className="w-50">
                 <Card.Body>
                     <Card.Title>Add Product</Card.Title>
-                    {formError && <Alert variant="danger">{formError}</Alert>} {/* Form error message */}
                     <Form onSubmit={handleSubmit}>
-                        {/* Barcode */}
+                        {/* Barcode Display */}
                         <Form.Group controlId="formBarcode">
                             <Form.Label>Barcode</Form.Label>
                             <Form.Control
                                 type="text"
                                 name="barcode"
-                                value={formData.barcode}
-                                onChange={handleInputChange}
-                                placeholder="Enter product barcode"
-                                required
+                                value={formData.barcode} // Display the generated barcode
+                                readOnly
                             />
+                            {/* Render the barcode if the barcode is generated */}
+                            {formData.barcode && (
+                                <div className="mt-3">
+                                    <Barcode 
+                                        value={formData.barcode} 
+                                        width={1}    // Adjust the width of each bar
+                                        height={50}  // Adjust the height of the barcode
+                                        displayValue={false} // Hides the value below the barcode
+                                    />
+                                </div>
+                            )}
                         </Form.Group>
 
-                        {/* Name */}
+                        {/* Other fields */}
                         <Form.Group controlId="formName">
                             <Form.Label>Name</Form.Label>
                             <Form.Control
@@ -67,7 +76,6 @@ const AddProduct = ({ formData, setFormData, addProduct, fetchProducts, setMessa
                             />
                         </Form.Group>
 
-                        {/* Description */}
                         <Form.Group controlId="formDescription">
                             <Form.Label>Description</Form.Label>
                             <Form.Control
@@ -76,10 +84,10 @@ const AddProduct = ({ formData, setFormData, addProduct, fetchProducts, setMessa
                                 value={formData.description}
                                 onChange={handleInputChange}
                                 placeholder="Enter product description"
+                                required
                             />
                         </Form.Group>
 
-                        {/* Price */}
                         <Form.Group controlId="formPrice">
                             <Form.Label>Price</Form.Label>
                             <Form.Control
@@ -92,7 +100,6 @@ const AddProduct = ({ formData, setFormData, addProduct, fetchProducts, setMessa
                             />
                         </Form.Group>
 
-                        {/* Quantity */}
                         <Form.Group controlId="formQuantity">
                             <Form.Label>Quantity</Form.Label>
                             <Form.Control
@@ -105,7 +112,6 @@ const AddProduct = ({ formData, setFormData, addProduct, fetchProducts, setMessa
                             />
                         </Form.Group>
 
-                        {/* Category */}
                         <Form.Group controlId="formCategory">
                             <Form.Label>Category</Form.Label>
                             <Form.Control
@@ -118,8 +124,8 @@ const AddProduct = ({ formData, setFormData, addProduct, fetchProducts, setMessa
                             />
                         </Form.Group>
 
-                        <Button variant="success" type="submit" disabled={loading}>
-                            {loading ? 'Adding...' : 'Add Product'}
+                        <Button variant="success" type="submit">
+                            Add Product
                         </Button>
                     </Form>
                 </Card.Body>
