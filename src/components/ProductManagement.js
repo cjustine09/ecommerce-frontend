@@ -135,14 +135,14 @@ const ProductManagement = () => {
             {message && <Alert variant="success" style={{ marginLeft: '20px' }}>{message}</Alert>}
 
             {/* Display buttons side by side */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginRight: '200px', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginRight: '100px', marginBottom: '20px' }}>
                 <Button onClick={() => handleSwitchView('dashboard')} variant="dark" style={{ marginRight: '10px' }}>
                     Product List
                 </Button>
                 <Button onClick={() => handleSwitchView('add')} variant="dark" style={{ marginRight: '10px' }}>
                     Add Product
                 </Button>
-                <Button onClick={logOut} variant="success">
+                <Button onClick={logOut} variant="dark">
                     Logout
                 </Button>
             </div>

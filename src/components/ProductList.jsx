@@ -24,7 +24,7 @@ const ProductList = ({ products, handleEdit, handleDelete }) => {
                             <Barcode 
                                 value={product.barcode} 
                                 width={1}   // Adjust the width (default is 2)
-                                height={30} // Adjust the height (default is 100)
+                                height={25} // Adjust the height (default is 100)
                                 displayValue={true} // Optionally hide the text value
                             />
                         </td>

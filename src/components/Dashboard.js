@@ -19,16 +19,16 @@ import SearchBar from './Searchbar';
  * @param {Function} props.handleSearchChange - Handler for search input changes
  * @param {Function} props.handleSearch - Handler for search form submission
  */
-const Dashboard = ({
-  products,
-  handleEdit,
-  handleDelete,
-  searchQuery,
-  loading,
-  error,
-  handleSearchChange,
-  handleSearch,
-}) => {
+    const Dashboard = ({
+        products,
+        handleEdit,
+        handleDelete,
+        searchQuery,
+        loading,
+        error,
+        handleSearchChange,
+        handleSearch,
+    }) => {
   return (
     // Container element to center the content horizontally
     <Container className="d-flex justify-content-center mt-5">

@@ -58,7 +58,7 @@ const AddProduct = ({ formData, setFormData, addProduct, fetchProducts, setMessa
                             <Barcode 
                                 value={formData.barcode} 
                                 width={1}    // Adjust the width of each bar
-                                height={50}  // Adjust the height of the barcode
+                                height={25}  // Adjust the height of the barcode
                                 displayValue={true} // Hides the value below the barcode
                             />
                         </div>
