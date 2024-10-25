@@ -135,12 +135,13 @@ const AddProduct = ({ formData, setFormData, addProduct, fetchProducts}) => {
                                 required
                             >
                                 <option value="">Select a category</option>
-                                <option value="Electronics">Electronics</option>
-                                <option value="Clothing">Clothing</option>
-                                <option value="Flower">Flower</option>
-                                <option value="Beauty">Beauty</option>
-                                <option value="Sports">Sports</option>
-                                <option value="Other">Other</option>
+                                <option value="SmartPhones">SmartPhones</option>
+                                <option value="TV">TV</option>
+                                <option value="Tablets">Tablets</option>
+                                <option value="Laptops">Laptops</option>
+                                <option value="Computers">Computers</option>
+                                <option value="Computer Accessories">Computer Accessories</option>
+                                <option value="Other Accessories">Other Accessories</option>
                             </Form.Select>
                         </Form.Group>
 
