@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Form, Alert, Container, Card, Spinner } from 'react-bootstrap';
+import { Button, Form, Alert, Container, Card, Spinner, InputGroup } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faEyeSlash, faLock, faUser } from '@fortawesome/free-solid-svg-icons';
 
 // FUNCTION OF LOGIN FORM
 function LoginForm() {
@@ -9,6 +11,7 @@ function LoginForm() {
     const [password, setPassword] = useState(""); // State to store the password input
     const [errorMessage, setErrorMessage] = useState(""); // State to store error messages
     const [loading, setLoading] = useState(false); // State to indicate loading status
+    const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility 
     const navigate = useNavigate(); // Hook to programmatically navigate
 
     // Effect to check if user is already logged in
@@ -90,26 +93,40 @@ function LoginForm() {
                                 </Alert>
                             )}
                             <Form.Group controlId="formBasicEmail">
-                                <Form.Label className="font-weight-bold">Email address</Form.Label>
-                                <Form.Control
-                                    type='email' // Input type for email
-                                    placeholder='Enter email' // Placeholder text
-                                    onChange={(e) => setEmail(e.target.value)} // Update email state on change
-                                    required // Required field
-                                    className="bg-light text-dark" // Styling
-                                />
-                            </Form.Group>
+                            <Form.Label className="font-weight-bold">Email address</Form.Label>
+                            <InputGroup>
+                            <InputGroup.Text>
+                                    <FontAwesomeIcon icon={faUser} />
+                                </InputGroup.Text>
+                            <Form.Control
+                                type='email'
+                                placeholder='Enter email'
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                                className="bg-light text-dark"
+                            />
+                            </InputGroup>
+                        </Form.Group>
+                        <Form.Group controlId="formBasicPassword" className="mt-3">
+                            <Form.Label className="font-weight-bold">Password</Form.Label>
+                            <InputGroup>
+                            <InputGroup.Text>
+                                    <FontAwesomeIcon icon={faLock} />
+                                </InputGroup.Text>
 
-                            <Form.Group controlId="formBasicPassword" className="mt-3">
-                                <Form.Label className="font-weight-bold">Password</Form.Label>
                                 <Form.Control
-                                    type='password' // Input type for password
-                                    placeholder ='Enter password' // Placeholder text
-                                    onChange={(e) => setPassword(e.target.value)} // Update password state on change
-                                    required // Required field
-                                    className="bg-light text-dark" // Styling
+                                    type={showPassword ? 'text' : 'password'}
+                                    placeholder='Enter Password'
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                    className="bg-light text-dark"
                                 />
-                            </Form.Group>
+                                <InputGroup.Text onClick={() => setShowPassword(!showPassword)} style={{ cursor: 'pointer' }}>
+                                    <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                                </InputGroup.Text>
+                            </InputGroup>
+                        </Form.Group>
+
 
                             <Button
                                 variant="dark" // Button variant
