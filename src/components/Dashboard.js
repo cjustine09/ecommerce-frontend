@@ -72,23 +72,24 @@ const Dashboard = ({
 
           {/* Category checkboxes */}
           <Row className="mb-3">
-            <Col>
-              <Form>
-                <Row>
-                  {categories.map((category, index) => (
-                    <Col key={index} xs={4} sm={3}>
-                      <Form.Check 
-                        type="checkbox" 
-                        label={category} 
-                        checked={selectedCategories.includes(category)} 
-                        onChange={() => handleCategoryChange(category)} 
-                      />
-                    </Col>
-                  ))}
-                </Row>
-              </Form>
-            </Col>
-          </Row>
+           <Col>
+            <Form>
+             <Row className="d-flex justify-content-start" style={{ flexWrap: 'nowrap' }}>
+              {categories.map((category, index) => (
+               <Col key={index} xs="auto" className="mb-2">
+                <Form.Check 
+                 type="checkbox" 
+                 label={category} 
+                 checked={selectedCategories.includes(category)} 
+                 onChange={() => handleCategoryChange(category)} 
+               />
+              </Col>
+             ))}
+            </Row>
+           </Form>
+          </Col>
+         </Row>
+
 
           {/* Conditional rendering for loading, error, and products */}
           {loading && <p>Loading...</p>}

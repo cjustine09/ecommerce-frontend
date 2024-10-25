@@ -112,13 +112,11 @@ const EditProduct = ({ formData, setFormData, updateProduct, currentProductId,
                                 required
                             >
                                 <option value="">Select a category</option>
-                                <option value="SmartPhones">SmartPhones</option>
-                                <option value="TV">TV</option>
-                                <option value="Tablets">Tablets</option>
-                                <option value="Laptops">Laptops</option>
+                                <option value="Mobile">Mobile</option>
+                                <option value="TV & AV">TV & AV</option>
                                 <option value="Computers">Computers</option>
-                                <option value="Computer Accessories">Computer Accessories</option>
-                                <option value="Other Accessories">Other Accessories</option>
+                                <option value="Home Applieances">Home Appliances</option>
+                                <option value="Accessories">Accessories</option>
                             </Form.Select>
                         </Form.Group>
 
