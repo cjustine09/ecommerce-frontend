@@ -29,7 +29,7 @@ const EditProduct = ({ formData, setFormData, updateProduct, currentProductId,
             setShowPrompt(true); // Show the prompt after updating
             setTimeout(() => {
                 navigate('/'); // Navigate to the product list after the prompt
-            }, 10); // Navigate after 2 seconds
+            }, 2000); // Navigate after 2 seconds
         } catch (err) {
             setError('An error occurred while updating the product.');
             clearMessage();

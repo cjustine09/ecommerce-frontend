@@ -176,7 +176,7 @@ const AddProduct = ({ formData, setFormData, addProduct, fetchProducts}) => {
 
             {/* Message Modal */}
             <Modal show={showMessageModal} onHide={handleCloseMessageModal}>
-                <Modal.Header closeButton>
+                <Modal.Header>
                     <Modal.Title>{isError ? 'Error' : 'Success'}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>{message}</Modal.Body>
