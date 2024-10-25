@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Form, Alert, Container, Card, Spinner, InputGroup } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye, faEyeSlash, faLock, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faEyeSlash, faLock, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 
 // FUNCTION OF LOGIN FORM
 function LoginForm() {
@@ -96,7 +96,7 @@ function LoginForm() {
                             <Form.Label className="font-weight-bold">Email address</Form.Label>
                             <InputGroup>
                             <InputGroup.Text>
-                                    <FontAwesomeIcon icon={faUser} />
+                                    <FontAwesomeIcon icon={faEnvelope} />
                                 </InputGroup.Text>
                             <Form.Control
                                 type='email'
