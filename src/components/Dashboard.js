@@ -1,13 +1,13 @@
 // Import necessary dependencies from React and React Bootstrap
-import React from 'react';
-import { Card, Container, Row, Col } from 'react-bootstrap';
+import React, { useState } from 'react';
+import { Card, Container, Row, Col, Form } from 'react-bootstrap';
 
 // Import custom components for product listing and search bar
 import ProductList from './ProductList';
 import SearchBar from './Searchbar';
 
 /**
- * Dashboard component that displays a list of products and a search bar.
+ * Dashboard component that displays a list of products, a search bar, and category checkboxes.
  * 
  * @param {Object} props - Component props
  * @param {Array} props.products - List of products to display
@@ -18,23 +18,43 @@ import SearchBar from './Searchbar';
  * @param {String} props.error - Error message if something goes wrong
  * @param {Function} props.handleSearchChange - Handler for search input changes
  * @param {Function} props.handleSearch - Handler for search form submission
+ * @param {Array} props.categories - List of product categories
  */
 const Dashboard = ({
-  products,
-  handleEdit,
-  handleDelete,
-  searchQuery,
-  loading,
-  error,
-  handleSearchChange,
-  handleSearch,
+    products,
+    handleEdit,
+    handleDelete,
+    searchQuery,
+    loading,
+    error,
+    handleSearchChange,
+    handleSearch,
+    categories // Add categories prop
 }) => {
+  // State to manage selected categories
+  const [selectedCategories, setSelectedCategories] = useState([]);
+
+  // Function to handle checkbox change
+  const handleCategoryChange = (category) => {
+    if (selectedCategories.includes(category)) {
+      // Remove category if already selected
+      setSelectedCategories(selectedCategories.filter((cat) => cat !== category));
+    } else {
+      // Add category to selected categories
+      setSelectedCategories([...selectedCategories, category]);
+    }
+  };
+
+  // Filter products based on selected categories
+  const filteredProducts = selectedCategories.length > 0
+    ? products.filter((product) => selectedCategories.includes(product.category))
+    : products;
+
   return (
-    // Container element to center the content horizontally
     <Container className="d-flex justify-content-center mt-5">
       <Card className="w-100">
         <Card.Body>
-          {/* Row element to display the title and search bar */}
+          {/* Row element to display the title, search bar, and category checkboxes */}
           <Row className="align-items-center mb-4">
             <Col md={6}>
               {/* Title of the product list */}
@@ -43,36 +63,47 @@ const Dashboard = ({
             <Col md={6} className="text-end">
               {/* Search bar component with props for handling search input and submission */}
               <SearchBar
-                handleSearchChange={handleSearchChange} // Pass the search input handler
-                handleSearch={handleSearch} // Pass the search form submission handler
-                searchQuery={searchQuery} // Pass the current search query
+                handleSearchChange={handleSearchChange}
+                handleSearch={handleSearch}
+                searchQuery={searchQuery}
               />
             </Col>
           </Row>
 
-          {/* Conditional rendering for loading, error, and products */}
-          {loading && (
-            // Display loading message when data is being fetched
-            <p>Loading...</p>
-          )}
-          {error && (
-            // Display error message if something goes wrong
-            <p style={{ color: 'red' }}>{error}</p>
-          )}
+          {/* Category checkboxes */}
+          <Row className="mb-3">
+            <Col>
+              <Form>
+                <Row>
+                  {categories.map((category, index) => (
+                    <Col key={index} xs={4} sm={3}>
+                      <Form.Check 
+                        type="checkbox" 
+                        label={category} 
+                        checked={selectedCategories.includes(category)} 
+                        onChange={() => handleCategoryChange(category)} 
+                      />
+                    </Col>
+                  ))}
+                </Row>
+              </Form>
+            </Col>
+          </Row>
 
-          {/* Display products if data is available and no errors */}
+          {/* Conditional rendering for loading, error, and products */}
+          {loading && <p>Loading...</p>}
+          {error && <p style={{ color: 'red' }}>{error}</p>}
+
           {!loading && !error && (
-            products.length === 0 ? (
-              // Display message if no products are available
+            filteredProducts.length === 0 ? (
               <Card style={{ marginTop: '20px', padding: '20px', textAlign: 'center' }}>
                 <Card.Body>
                   <Card.Text>No products available</Card.Text>
                 </Card.Body>
               </Card>
             ) : (
-              // Display product list component with props for handling edit and delete actions
               <ProductList
-                products={products} // Display all products
+                products={filteredProducts} // Display filtered products
                 handleEdit={handleEdit}
                 handleDelete={handleDelete}
               />

@@ -20,6 +20,7 @@ const ProductManagement = () => {
     const [error, setError] = useState(null);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
+    const [showDeletePrompt, setShowDeletePrompt] = useState(false); // State for delete prompt
     const navigate = useNavigate();
 
     const fetchProducts = useCallback(async () => {
@@ -91,15 +92,18 @@ const ProductManagement = () => {
     const confirmDelete = async () => {
         try {
             await deleteProduct(deletionId);
-            setMessage('Product Deleted Successfully!');
             fetchProducts();
             clearMessage();
+            setShowDeleteModal(false);
+            setShowDeletePrompt(true); // Show the delete prompt
+            setTimeout(() => {
+                setShowDeletePrompt(false); // Hide prompt after a delay
+            }, 2000);
         } catch (err) {
             setError('An error occurred while deleting the product. Please try again.');
             clearMessage();
             console.error('Error deleting product:', err);
         } finally {
-            setShowDeleteModal(false);
             setDeletionId(null);
         }
     };
@@ -116,7 +120,7 @@ const ProductManagement = () => {
 
     const logOut = () => {
         setShowLogoutModal(true);
-    }
+    };
 
     const confirmLogout = () => {
         localStorage.removeItem("user-info");
@@ -135,14 +139,14 @@ const ProductManagement = () => {
             {message && <Alert variant="success" style={{ marginLeft: '20px' }}>{message}</Alert>}
 
             {/* Display buttons side by side */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginRight: '200px', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginRight: '100px', marginBottom: '20px' }}>
                 <Button onClick={() => handleSwitchView('dashboard')} variant="dark" style={{ marginRight: '10px' }}>
                     Product List
                 </Button>
                 <Button onClick={() => handleSwitchView('add')} variant="dark" style={{ marginRight: '10px' }}>
                     Add Product
                 </Button>
-                <Button onClick={logOut} variant="success">
+                <Button onClick={logOut} variant="dark">
                     Logout
                 </Button>
             </div>
@@ -156,6 +160,7 @@ const ProductManagement = () => {
                     handleDelete={handleDelete}
                     searchQuery={searchQuery}
                     loading={loading}
+                    categories={['Electronics', 'Clothing', 'Accessories', 'Flower', 'Other']}
                 />
             )}
 
@@ -214,6 +219,14 @@ const ProductManagement = () => {
                         Delete
                     </Button>
                 </Modal.Footer>
+            </Modal>
+
+            {/* Simple Prompt after Product Deletion */}
+            <Modal show={showDeletePrompt} onHide={() => setShowDeletePrompt(false)}>
+                <Modal.Header>
+                    <Modal.Title>Product Deleted</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>Your product has been deleted successfully!</Modal.Body>
             </Modal>
         </div>
     );

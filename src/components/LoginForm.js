@@ -93,7 +93,7 @@ function LoginForm() {
                             />
                         </Form.Group>
 
-                        <Button variant="primary" onClick={login} className="mt-3">
+                        <Button variant="dark" onClick={login} className="mt-3 w-100">
                             Login
                         </Button>
                     </Form>

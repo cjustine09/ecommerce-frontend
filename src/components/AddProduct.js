@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Button, Card, Container, Modal } from 'react-bootstrap';
-import Barcode from 'react-barcode'; // Import the Barcode component
+import Barcode from 'react-barcode';
+import { useNavigate } from 'react-router-dom';
 
-const AddProduct = ({ formData, setFormData, addProduct, fetchProducts, setMessage, setError, clearMessage }) => {
+const AddProduct = ({ formData, setFormData, addProduct, fetchProducts}) => {
     const [showModal, setShowModal] = useState(false);
+    const [showMessageModal, setShowMessageModal] = useState(false);
+    const [message, setMessage] = useState('');
+    const [isError, setIsError] = useState(false);
+    const navigate = useNavigate();
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -11,39 +16,49 @@ const AddProduct = ({ formData, setFormData, addProduct, fetchProducts, setMessa
     };
 
     const generateBarcode = () => {
-        // Generate a random barcode (you can customize this logic)
         return Math.floor(Math.random() * 1000000000).toString();
     };
 
     useEffect(() => {
-        // Generate a new barcode when the component mounts
         const newBarcode = generateBarcode();
         setFormData((prevData) => ({ ...prevData, barcode: newBarcode }));
-    }, [setFormData]); // Empty dependency array means this runs once on mount
+    }, [setFormData]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        setShowModal(true); // Show the confirmation modal
+        setShowModal(true);
     };
 
     const handleConfirmAdd = async () => {
         try {
             await addProduct(formData);
             setMessage('Product Added Successfully!');
+            setIsError(false);
             fetchProducts();
-            // Optionally clear the form after successful addition
             setFormData({ name: '', description: '', price: '', quantity: '', category: '', barcode: '' });
-            clearMessage();
+            setShowMessageModal(true);
+            setTimeout(() => {
+                setShowMessageModal(false); // Hide prompt after a delay
+                navigate('/');
+            }, 2000);
         } catch (err) {
-            setError('An error occurred while adding the product.');
-            clearMessage();
+            setMessage('An error occurred while adding the product.');
+            setIsError(true);
         } finally {
-            setShowModal(false); // Close the modal after the operation
+            setShowModal(false);
+            setShowMessageModal(true); // Show the message modal after the operation
         }
     };
 
-    const handleClose = () => setShowModal(false); // Close the modal
+    const handleCancel = () => {
+        setFormData({ name: '', description: '', price: '', quantity: '', category: '', barcode: '' });
+        setTimeout(() => {
+            navigate('/');
+        }, 10);
+    };
 
+    const handleCloseModal = () => setShowModal(false);
+    const handleCloseMessageModal = () => setShowMessageModal(false); // Close the message modal
 
     return (
         <Container className="d-flex justify-content-center mt-5">
@@ -54,15 +69,13 @@ const AddProduct = ({ formData, setFormData, addProduct, fetchProducts, setMessa
                         {/* Barcode Display */}
                         <div className="mb-3">
                             <Form.Label>Barcode:</Form.Label>
-                            {/* Render the barcode directly without an input field */}
                             <Barcode 
                                 value={formData.barcode} 
-                                width={1}    // Adjust the width of each bar
-                                height={50}  // Adjust the height of the barcode
-                                displayValue={true} // Hides the value below the barcode
+                                width={1}
+                                height={25}
+                                displayValue={true}
                             />
                         </div>
-
 
                         {/* Other fields */}
                         <Form.Group controlId="formName">
@@ -115,40 +128,59 @@ const AddProduct = ({ formData, setFormData, addProduct, fetchProducts, setMessa
 
                         <Form.Group controlId="formCategory">
                             <Form.Label>Category</Form.Label>
-                            <Form.Control
-                                type="text"
+                            <Form.Select
                                 name="category"
                                 value={formData.category}
                                 onChange={handleInputChange}
-                                placeholder="Enter product category"
                                 required
-                            />
+                            >
+                                <option value="">Select a category</option>
+                                <option value="Electronics">Electronics</option>
+                                <option value="Clothing">Clothing</option>
+                                <option value="Flower">Flower</option>
+                                <option value="Beauty">Beauty</option>
+                                <option value="Sports">Sports</option>
+                                <option value="Other">Other</option>
+                            </Form.Select>
                         </Form.Group>
 
                         <div className="mt-3">
-                            <Button variant="success" type="submit">
+                            <Button variant="dark" type="submit">
                                 Add 
                             </Button>
+
+                            <Button className="ms-2"variant="dark" onClick={handleCancel}>
+                                Cancel
+                            </Button>
+
                         </div>
                     </Form>
                 </Card.Body>
             </Card>
 
-            <Modal show={showModal} onHide={handleClose}>
+            {/* Confirmation Modal */}
+            <Modal show={showModal} onHide={handleCloseModal}>
                 <Modal.Header closeButton>
                     <Modal.Title>Confirm Add Product</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>Are you sure you want to add this product?</Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>
-                            Cancel
+                    <Button variant="secondary" onClick={handleCloseModal}>
+                        Cancel
                     </Button>
                     <Button variant="primary" onClick={handleConfirmAdd}>
-                            Add
+                        Add
                     </Button>
                 </Modal.Footer>
             </Modal>
 
+            {/* Message Modal */}
+            <Modal show={showMessageModal} onHide={handleCloseMessageModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>{isError ? 'Error' : 'Success'}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>{message}</Modal.Body>
+            </Modal>
         </Container>
     );
 };
