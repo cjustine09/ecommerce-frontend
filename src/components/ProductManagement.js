@@ -123,8 +123,18 @@ const ProductManagement = () => {
     };
 
     const confirmLogout = () => {
+        // Clear user information from localStorage
         localStorage.removeItem("user-info");
-        navigate("/");
+
+        // Navigate to the login page with replace to prevent going back
+        navigate("/", { replace: true });
+
+        // Optionally prevent going back to the previous page
+        window.history.pushState(null, "", window.location.href);
+        window.onpopstate = function () {
+            window.history.go(1);
+        };
+
         setShowLogoutModal(false);
     };
 
