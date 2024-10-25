@@ -122,7 +122,7 @@ function LoginForm() {
                                     className="bg-light text-dark"
                                 />
                                 <InputGroup.Text onClick={() => setShowPassword(!showPassword)} style={{ cursor: 'pointer' }}>
-                                    <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                                    <FontAwesomeIcon icon={!showPassword ? faEyeSlash : faEye} />
                                 </InputGroup.Text>
                             </InputGroup>
                         </Form.Group>
