@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Form, Alert, Container, Card, Spinner, InputGroup } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye, faEyeSlash, faLock, faEnvelope } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faEyeSlash, faLock, faEnvelope, faUserCircle } from '@fortawesome/free-solid-svg-icons';
 
 // FUNCTION OF LOGIN FORM
 function LoginForm() {
@@ -78,8 +78,8 @@ function LoginForm() {
     return (
         <Container className="d-flex flex-column justify-content-center align-items-center" style={{ height: '100vh' }}>
             <Card className="bg-light text-dark shadow-lg" style={{ width: '600px', borderRadius: '15px', backgroundColor: 'rgba(255, 255, 255, 0.7)' }}>
+            <FontAwesomeIcon className='mt-5'icon={faUserCircle} size='8x'/>
                 <h1 className='text-center pt-5 font-weight-bold'>ADMIN LOGIN</h1>
-                
                 <Card.Body className='p-5'>
                     {loading ? ( // Show loading spinner if loading is true
                         <div className="d-flex justify-content-center">
