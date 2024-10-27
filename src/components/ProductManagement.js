@@ -170,7 +170,7 @@ const ProductManagement = () => {
                     handleDelete={handleDelete}
                     searchQuery={searchQuery}
                     loading={loading}
-                    categories={['Mobile', 'TV & AV', 'Computers', 'Home Appliances', 'Accessories']}
+                    categories={['Mobile', 'TV & AV', 'Laptop', 'Home Appliances', 'Accessories']}
                 />
             )}
 
