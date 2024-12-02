@@ -137,7 +137,7 @@ const AddProduct = ({ formData, setFormData, addProduct, fetchProducts}) => {
                                 <option value="">Select a category</option>
                                 <option value="Mobile">Mobile</option>
                                 <option value="TV & AV">TV & AV</option>
-                                <option value="Computers">Computers</option>
+                                <option value="Laptop">Laptop</option>
                                 <option value="Home Appliances">Home Appliances</option>
                                 <option value="Accessories">Accessories</option>
                             </Form.Select>
