@@ -1,6 +1,6 @@
 // src/components2/UserPage.js
 import React, { useEffect, useState } from 'react';
-import { Container, Row, Col, Card, Button, Badge } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Badge, Form } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -11,6 +11,8 @@ const UserPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [cartCount, setCartCount] = useState(0); // State to track the number of items in the cart
+    const [searchQuery, setSearchQuery] = useState(''); // State for search input
+    const [selectedCategories, setSelectedCategories] = useState([]); // State for selected categories
     const navigate = useNavigate(); // Hook for navigation
 
     useEffect(() => {
@@ -43,6 +45,24 @@ const UserPage = () => {
         updateCartCount(); // Update cart count after adding a product
     };
 
+    const handleSearchChange = (e) => {
+        setSearchQuery(e.target.value);
+    };
+
+    const handleCategoryChange = (category) => {
+        if (selectedCategories.includes(category)) {
+            setSelectedCategories(selectedCategories.filter((cat) => cat !== category));
+        } else {
+            setSelectedCategories([...selectedCategories, category]);
+        }
+    };
+
+    const filteredProducts = products.filter((product) => {
+        const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(product.category);
+        return matchesSearch && matchesCategory;
+    });
+
     if (loading) {
         return <p>Loading products...</p>;
     }
@@ -51,8 +71,12 @@ const UserPage = () => {
         return <p style={{ color: 'red' }}>{error}</p>;
     }
 
+    // Assuming categories are predefined
+    const categories = ['Mobile', 'TV & AV', 'Laptop', 'Home Appliances', 'Accessories'];
+
     return (
         <Container>
+            <h1 className="text-center mt-4">Welcome to Our Store</h1> {/* Centered Welcome Message */}
             <h1 className="mt-4">Product List</h1>
             <div className="d-flex justify-content-end mb-4">
                 <Button variant="primary" onClick={() => navigate('/cart')} className="position-relative">
@@ -64,9 +88,36 @@ const UserPage = () => {
                     )}
                 </Button>
             </div>
+
+            {/* Search Bar */}
+            <Form className="mb-4">
+                <Form.Control
+                    type="text"
+                    placeholder="Search products..."
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                />
+            </Form>
+
+            {/* Category Filters - Horizontal Checkboxes */}
+            <div className="mb-4">
+                <Row className="d-flex justify-content-start" style={{ flexWrap: 'nowrap' }}>
+                    {categories.map((category) => (
+                        <Col key={category} xs="auto" className="mb-2">
+                            <Form.Check
+                                type="checkbox"
+                                label={category}
+                                checked={selectedCategories.includes(category)}
+                                onChange={() => handleCategoryChange(category)}
+ />
+                        </Col>
+                    ))}
+                </Row>
+            </div>
+
             <Row>
-                {products.length > 0 ? (
-                    products.map((product) => (
+                {filteredProducts.length > 0 ? (
+                    filteredProducts.map((product) => (
                         <Col key={product.id} md={4} className="mb-4">
                             <Card>
                                 <Link to={`/products/${product.id}`}>
