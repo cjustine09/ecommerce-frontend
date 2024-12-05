@@ -4,6 +4,7 @@ import LoginForm from './components/LoginForm'; // Import LoginForm component
 import ProductManagement from './components/ProductManagement'; // Import ProductManagement component
 import ProductDetails from './components2/ProductDetails';
 import Userpage from './components2/Userpage';
+import Cart from './components/Cart'; // Import the Cart component
 
 const App = () => {
     return (
@@ -13,6 +14,7 @@ const App = () => {
             <Route path="/ProductManagement" element={<ProductManagement />} /> {/* Route for Product Management, renders the ProductManagement component */}
             <Route path="/store" element={<Userpage />} />
             <Route path="/products/:id" element={<ProductDetails />} />
+            <Route path="/cart" element={<Cart />} /> {/* Add this line */}
         </Routes>
     );
 }

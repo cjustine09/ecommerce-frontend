@@ -1,172 +1,98 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Card, Container, Row, Col, Button, Spinner, Form, Navbar, Nav } from 'react-bootstrap';
+// src/components2/UserPage.js
+import React, { useEffect, useState } from 'react';
+import { Container, Row, Col, Card, Button, Badge } from 'react-bootstrap';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 
-const Userpage = () => {
-  const [products, setProducts] = useState([]);
-  const [cartCount, setCartCount] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategories, setSelectedCategories] = useState([]);
-  const categories = ['Mobile', 'TV & AV', 'Laptop', 'Home Appliances', 'Accessories'];
+const UserPage = () => {
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [cartCount, setCartCount] = useState(0); // State to track the number of items in the cart
+    const navigate = useNavigate(); // Hook for navigation
 
-  useEffect(() => {
-    // Fetch products from the API
-    axios.get('http://localhost:8000/api/products')
-      .then((response) => {
-        setProducts(response.data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error('Error fetching products:', error);
-        setLoading(false);
-      });
-
-    // Fetch initial cart count from the backend or session
-    axios.get('http://localhost:8000/api/cart')
-      .then((response) => {
-        console.log('Initial cart data:', response.data); // Debug log
-        setCartCount(Object.keys(response.data).length);
-      })
-      .catch((error) => console.error('Error fetching cart data:', error));
-  }, []);
-
-  const handleAddToCart = (productId) => {
-    axios.post('http://localhost:8000/api/cart/add', { product_id: productId, quantity: 1 })
-        .then((response) => {
-            console.log('Response from add to cart:', response.data);
-            if (response.data.success) {
-                setCartCount((prevCount) => prevCount + 1); // Increment cart count locally
-                alert('Product added to cart successfully!');
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const response = await axios.get('http://localhost:8000/api/products'); // Adjust the API endpoint as needed
+                setProducts(response.data);
+            } catch (err) {
+                setError('Failed to fetch products. Please try again later.');
+                console.error(err);
+            } finally {
+                setLoading(false);
             }
-        })
-        .catch((error) => {
-            console.error('Error adding product to cart:', error);
-            alert('Failed to add product to cart.');
-        });
-};
+        };
 
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
-  };
+        fetchProducts();
+        updateCartCount(); // Update cart count on component mount
+    }, []);
 
-  const handleCategoryChange = (category) => {
-    if (selectedCategories.includes(category)) {
-      // Remove category if already selected
-      setSelectedCategories(selectedCategories.filter((cat) => cat !== category));
-    } else {
-      // Add category to selected categories
-      setSelectedCategories([...selectedCategories, category]);
+    const updateCartCount = () => {
+        const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
+        setCartCount(storedCart.length); // Set the cart count based on local storage
+    };
+
+    const handleAddToCart = (product) => {
+        const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
+        storedCart.push(product);
+        localStorage.setItem('cart', JSON.stringify(storedCart)); // Save to local storage
+        alert('Product added to cart successfully!'); // Simple alert for feedback
+        updateCartCount(); // Update cart count after adding a product
+    };
+
+    if (loading) {
+        return <p>Loading products...</p>;
     }
-  };
 
-  // Filter products based on search query and selected categories
-  const filteredProducts = products.filter((product) => {
-    const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          product.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategories.length > 0 ? selectedCategories.includes(product.category) : true;
-    return matchesSearch && matchesCategory;
-  });
+    if (error) {
+        return <p style={{ color: 'red' }}>{error}</p>;
+    }
 
-  if (loading) {
     return (
-      <div className="text-center">
-        <Spinner animation="border" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </Spinner>
-      </div>
-    );
-  }
-
-  return (
-    <>
-      {/* Navbar */}
-      <Navbar bg="light" expand="lg" className="mb-4">
         <Container>
-          <Navbar.Brand href="/">Our Store</Navbar.Brand>
-          <Nav className="ml-auto">
-            <Link to="/cart" className="nav-link">
-              🛒 Cart <span className="badge bg-primary">{cartCount}</span>
-            </Link>
-          </Nav>
+            <h1 className="mt-4">Product List</h1>
+            <div className="d-flex justify-content-end mb-4">
+                <Button variant="primary" onClick={() => navigate('/cart')} className="position-relative">
+                    <FontAwesomeIcon icon={faShoppingCart} />
+                    {cartCount > 0 && (
+                        <Badge pill bg="danger" style={{ position: 'absolute', top: '-10px', right: '-10px' }}>
+                            {cartCount}
+                        </Badge>
+                    )}
+                </Button>
+            </div>
+            <Row>
+                {products.length > 0 ? (
+                    products.map((product) => (
+                        <Col key={product.id} md={4} className="mb-4">
+                            <Card>
+                                <Link to={`/products/${product.id}`}>
+                                    <Card.Img variant="top" src={product.image} /> {/* Assuming product has an image */}
+                                </Link>
+                                <Card.Body>
+                                    <Card.Title>
+                                        <Link to={`/products/${product.id}`}>{product.name}</Link>
+                                    </Card.Title>
+                                    <Card.Text>{product.description}</Card.Text>
+                                    <Card.Text>₱{product.price}</Card.Text>
+                                    <Button variant="primary" onClick={() => handleAddToCart(product)}>
+                                        Add to Cart
+                                    </Button>
+                                </Card.Body>
+                            </Card>
+                        </Col>
+                    ))
+                ) : (
+                    <Col>
+                        <p>No products found.</p>
+                    </Col>
+                )}
+            </Row>
         </Container>
-      </Navbar>
-
-      {/* Main Content */}
-      <Container>
-        <h1 className="text-center mb-4">Welcome to Our Store</h1>
-
-        {/* Search Bar */}
-        <Row className="mb-4">
-          <Col md={6}>
-            <Form.Control
-              type="text"
-              placeholder="Search products..."
-              value={searchQuery}
-              onChange={handleSearchChange}
-            />
-          </Col>
-        </Row>
-
-        {/* Category Filters */}
-        <Row className="mb-3">
-          <Col>
-            <Form>
-              <Row className="d-flex justify-content-start" style={{ flexWrap: 'nowrap' }}>
-                {categories.map((category, index) => (
-                  <Col key={index} xs="auto" className="mb-2">
-                    <Form.Check 
-                      type="checkbox" 
-                      label={category} 
-                      checked={selectedCategories.includes(category)} 
-                      onChange={() => handleCategoryChange(category)} 
-                    />
-                  </Col>
-                ))}
-              </Row>
-            </Form>
-          </Col>
-        </Row>
-
-        {/* Product List */}
-        <Row>
-          {filteredProducts.length > 0 ? (
-            filteredProducts.map((product) => (
-              <Col md={4} sm={6} xs={12} className="mb-4" key={product.id}>
-                <Card>
-                  <Card.Body>
-                    <Card.Title>{product.name}</Card.Title>
-                    <Card.Text>
-                      {product.description.substring(0, 50)}...
-                    </Card.Text>
-                    <Card.Text>
-                      <strong>Price: ₱{product.price}</strong>
-                    </Card.Text>
-                    <div className="d-flex justify-content-between">
-                      <Link to={`/products/${product.id}`}>
-                        <Button variant="primary">View</Button>
-                      </Link>
-                      <Button 
-                        variant="success" 
-                        onClick={() => handleAddToCart(product.id)} 
-                      >
-                        Add to Cart
-                      </Button>
-                    </div>
-                  </Card.Body>
-                </Card>
-              </Col>
-            ))
-          ) : (
-            <Col>
-              <p>No products found</p>
-            </Col>
-          )}
-        </Row>
-      </Container>
-    </>
-  );
+    );
 };
 
-export default Userpage;
+export default UserPage;
