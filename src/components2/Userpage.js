@@ -127,7 +127,6 @@ const UserPage = () => {
                                     <Card.Title>
                                         <Link to={`/products/${product.id}`}>{product.name}</Link>
                                     </Card.Title>
-                                    <Card.Text>{product.description}</Card.Text>
                                     <Card.Text>₱{product.price}</Card.Text>
                                     <Button variant="primary" onClick={() => handleAddToCart(product)}>
                                         Add to Cart

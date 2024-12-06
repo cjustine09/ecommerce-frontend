@@ -1,10 +1,10 @@
-import React from 'react'; // Import React library
-import { Routes, Route } from 'react-router-dom'; // Import Routes and Route components from react-router-dom
-import LoginForm from './components/LoginForm'; // Import LoginForm component
-import ProductManagement from './components/ProductManagement'; // Import ProductManagement component
+import React from 'react';
+import { Routes, Route } from 'react-router-dom'; 
+import LoginForm from './components/LoginForm'; 
+import ProductManagement from './components/ProductManagement'; 
 import ProductDetails from './components2/ProductDetails';
 import Userpage from './components2/Userpage';
-import Cart from './components/Cart'; // Import the Cart component
+import Cart from './components/Cart'; 
 
 const App = () => {
     return (
@@ -19,4 +19,4 @@ const App = () => {
     );
 }
 
-export default App; // Export the App component as the default export
+export default App;
