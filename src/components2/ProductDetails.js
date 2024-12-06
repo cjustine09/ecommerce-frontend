@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
-import { Container, Card, Spinner } from 'react-bootstrap';
+import { Container, Card, Spinner, Button } from 'react-bootstrap';
 
 const ProductDetails = () => {
   const { id } = useParams(); // Get product ID from the URL
@@ -49,6 +49,10 @@ const ProductDetails = () => {
           <Card.Text><strong>Price: ₱{product.price}</strong></Card.Text>
         </Card.Body>
       </Card>
+
+      <Link to="/store">
+          <Button className="mt-3" variant="primary">Back</Button>
+      </Link>
     </Container>
   );
 };
