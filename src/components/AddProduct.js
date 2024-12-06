@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Button, Card, Container, Modal } from 'react-bootstrap';
+import { Form, Button, Card, Container, Modal, Row, Col } from 'react-bootstrap';
 import Barcode from 'react-barcode';
 import { useNavigate } from 'react-router-dom';
 
-const AddProduct = ({ formData, setFormData, addProduct, fetchProducts}) => {
+const AddProduct = ({ formData, setFormData, addProduct, fetchProducts }) => {
     const [showModal, setShowModal] = useState(false);
     const [showMessageModal, setShowMessageModal] = useState(false);
     const [message, setMessage] = useState('');
@@ -62,15 +62,15 @@ const AddProduct = ({ formData, setFormData, addProduct, fetchProducts}) => {
 
     return (
         <Container className="d-flex justify-content-center mt-5">
-            <Card className="w-50">
+            <Card className="w-100 w-md-75 w-lg-50">
                 <Card.Body>
                     <Card.Title>Add Product</Card.Title>
                     <Form onSubmit={handleSubmit}>
                         {/* Barcode Display */}
                         <div className="mb-3">
                             <Form.Label>Barcode:</Form.Label>
-                            <Barcode 
-                                value={formData.barcode} 
+                            <Barcode
+                                value={formData.barcode}
                                 width={1}
                                 height={25}
                                 displayValue={true}
@@ -143,16 +143,18 @@ const AddProduct = ({ formData, setFormData, addProduct, fetchProducts}) => {
                             </Form.Select>
                         </Form.Group>
 
-                        <div className="mt-3">
-                            <Button variant="dark" type="submit">
-                                Add 
-                            </Button>
-
-                            <Button className="ms-2"variant="dark" onClick={handleCancel}>
-                                Cancel
-                            </Button>
-
-                        </div>
+                        <Row className="mt-3">
+                            <Col xs={12} md="auto">
+                                <Button variant="dark" type="submit" block>
+                                    Add
+                                </Button>
+                            </Col>
+                            <Col xs={12} md="auto" className="mt-2 mt-md-0">
+                                <Button variant="dark" onClick={handleCancel} block>
+                                    Cancel
+                                </Button>
+                            </Col>
+                        </Row>
                     </Form>
                 </Card.Body>
             </Card>

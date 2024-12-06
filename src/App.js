@@ -4,7 +4,7 @@ import LoginForm from './components/LoginForm';
 import ProductManagement from './components/ProductManagement'; 
 import ProductDetails from './components2/ProductDetails';
 import Userpage from './components2/Userpage';
-import Cart from './components/Cart'; 
+import Cart from './components2/Cart'; 
 
 const App = () => {
     return (

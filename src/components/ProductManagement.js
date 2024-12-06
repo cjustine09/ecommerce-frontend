@@ -144,12 +144,12 @@ const ProductManagement = () => {
 
     return (
         <div>
-            <h2 style={{ marginLeft: '550px', marginTop: '30px' }}>Product Management</h2>
+             <h2 className="text-center mt-3">Product Management</h2>
             {error && <Alert variant="danger" style={{ marginLeft: '20px' }}>{error}</Alert>}
             {message && <Alert variant="success" style={{ marginLeft: '20px' }}>{message}</Alert>}
 
             {/* Display buttons side by side */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginRight: '100px', marginBottom: '20px' }}>
+            <div style={{display: 'flex', justifyContent: 'flex-end', marginRight: '100px', marginBottom: '20px'}}>
                 <Button onClick={() => handleSwitchView('dashboard')} variant="dark" style={{ marginRight: '10px' }}>
                     Product List
                 </Button>

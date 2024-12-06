@@ -7,7 +7,7 @@ const EditProduct = ({ formData, setFormData, updateProduct, currentProductId,
                        fetchProducts, setError, clearMessage }) => {
 
     const [showModal, setShowModal] = useState(false);
-    const [showPrompt, setShowPrompt] = useState(false); // State to control prompt visibility
+    const [showPrompt, setShowPrompt] = useState(false); 
     const navigate = useNavigate();
 
     const handleInputChange = (e) => {
@@ -17,7 +17,7 @@ const EditProduct = ({ formData, setFormData, updateProduct, currentProductId,
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setShowModal(true); // Show the modal when the submit button is clicked
+        setShowModal(true);
     };
 
     const confirmUpdate = async () => {
@@ -25,11 +25,11 @@ const EditProduct = ({ formData, setFormData, updateProduct, currentProductId,
             await updateProduct(currentProductId, formData);
             fetchProducts();
             clearMessage();
-            setShowModal(false); // Hide the update confirmation modal
-            setShowPrompt(true); // Show the prompt after updating
+            setShowModal(false);
+            setShowPrompt(true); 
             setTimeout(() => {
-                navigate('/'); // Navigate to the product list after the prompt
-            }, 2000); // Navigate after 2 seconds
+                navigate('/');
+            }, 2000); 
         } catch (err) {
             setError('An error occurred while updating the product.');
             clearMessage();
@@ -43,13 +43,13 @@ const EditProduct = ({ formData, setFormData, updateProduct, currentProductId,
         }, 10);
     };
 
-    const handleClose = () => setShowModal(false); // Close modal without submitting
+    const handleClose = () => setShowModal(false);
 
-    const handlePromptClose = () => setShowPrompt(false); // Close the prompt (if needed)
+    const handlePromptClose = () => setShowPrompt(false);
 
     return (
         <Container className="d-flex justify-content-center mt-5">
-            <Card className="w-50">
+            <Card className="w-100 w-md-75 w-lg-50">  {/* Make card width responsive */}
                 <Card.Body>
                     <Card.Title>Edit Product</Card.Title>
                     <Form onSubmit={handleSubmit}>
@@ -132,7 +132,7 @@ const EditProduct = ({ formData, setFormData, updateProduct, currentProductId,
                 </Card.Body>
             </Card>
 
-            {/* Confirmation Modal for Product Update */}
+            {/* Confirmation Modal */}
             <Modal show={showModal} onHide={handleClose}>
                 <Modal.Header closeButton>
                     <Modal.Title>Confirm Update</Modal.Title>
@@ -148,7 +148,7 @@ const EditProduct = ({ formData, setFormData, updateProduct, currentProductId,
                 </Modal.Footer>
             </Modal>
 
-            {/* Simple Prompt after Product Update */}
+            {/* Success Prompt */}
             <Modal show={showPrompt} onHide={handlePromptClose}>
                 <Modal.Header>
                     <Modal.Title>Product Updated</Modal.Title>

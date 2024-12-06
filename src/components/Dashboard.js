@@ -1,8 +1,5 @@
-// Import necessary dependencies from React and React Bootstrap
 import React, { useState } from 'react';
 import { Card, Container, Row, Col, Form } from 'react-bootstrap';
-
-// Import custom components for product listing and search bar
 import ProductList from './ProductList';
 import SearchBar from './Searchbar';
 
@@ -56,11 +53,11 @@ const Dashboard = ({
         <Card.Body>
           {/* Row element to display the title, search bar, and category checkboxes */}
           <Row className="align-items-center mb-4">
-            <Col md={6}>
+            <Col xs={12} md={6}>
               {/* Title of the product list */}
               <Card.Title>Product List</Card.Title>
             </Col>
-            <Col md={6} className="text-end">
+            <Col xs={12} md={6} className="text-md-end text-center">
               {/* Search bar component with props for handling search input and submission */}
               <SearchBar
                 handleSearchChange={handleSearchChange}
@@ -72,24 +69,23 @@ const Dashboard = ({
 
           {/* Category checkboxes */}
           <Row className="mb-3">
-           <Col>
-            <Form>
-             <Row className="d-flex justify-content-start" style={{ flexWrap: 'nowrap' }}>
-              {categories.map((category, index) => (
-               <Col key={index} xs="auto" className="mb-2">
-                <Form.Check 
-                 type="checkbox" 
-                 label={category} 
-                 checked={selectedCategories.includes(category)} 
-                 onChange={() => handleCategoryChange(category)} 
-               />
-              </Col>
-             ))}
-            </Row>
-           </Form>
-          </Col>
-         </Row>
-
+            <Col xs={12}>
+              <Form>
+                <Row className="d-flex justify-content-start" style={{ flexWrap: 'nowrap' }}>
+                  {categories.map((category, index) => (
+                    <Col key={index} xs="auto" className="mb-2">
+                      <Form.Check
+                        type="checkbox"
+                        label={category}
+                        checked={selectedCategories.includes(category)}
+                        onChange={() => handleCategoryChange(category)}
+                      />
+                    </Col>
+                  ))}
+                </Row>
+              </Form>
+            </Col>
+          </Row>
 
           {/* Conditional rendering for loading, error, and products */}
           {loading && <p>Loading...</p>}
