@@ -13,6 +13,7 @@ const UserPage = () => {
     const [cartCount, setCartCount] = useState(0); // State to track the number of items in the cart
     const [searchQuery, setSearchQuery] = useState(''); // State for search input
     const [selectedCategories, setSelectedCategories] = useState([]); // State for selected categories
+    const [quantities, setQuantities] = useState({}); // State for tracking quantities per product
     const navigate = useNavigate(); // Hook for navigation
 
     useEffect(() => {
@@ -20,6 +21,12 @@ const UserPage = () => {
             try {
                 const response = await axios.get('http://localhost:8000/api/products'); // Adjust the API endpoint as needed
                 setProducts(response.data);
+                // Initialize quantities for each product
+                const initialQuantities = {};
+                response.data.forEach((product) => {
+                    initialQuantities[product.id] = 1; // Default quantity is 1
+                });
+                setQuantities(initialQuantities);
             } catch (err) {
                 setError('Failed to fetch products. Please try again later.');
                 console.error(err);
@@ -39,10 +46,22 @@ const UserPage = () => {
 
     const handleAddToCart = (product) => {
         const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
-        storedCart.push(product);
+        const quantity = quantities[product.id];
+        storedCart.push({ ...product, quantity }); // Add product with selected quantity
         localStorage.setItem('cart', JSON.stringify(storedCart)); // Save to local storage
         alert('Product added to cart successfully!'); // Simple alert for feedback
         updateCartCount(); // Update cart count after adding a product
+    };
+
+    const handleQuantityChange = (productId, action) => {
+        setQuantities((prevQuantities) => {
+            const currentQuantity = prevQuantities[productId];
+            const newQuantity =
+                action === 'increment'
+                    ? Math.min(currentQuantity + 1, products.find((p) => p.id === productId).quantity)
+                    : Math.max(currentQuantity - 1, 1);
+            return { ...prevQuantities, [productId]: newQuantity };
+        });
     };
 
     const handleSearchChange = (e) => {
@@ -109,7 +128,7 @@ const UserPage = () => {
                                 label={category}
                                 checked={selectedCategories.includes(category)}
                                 onChange={() => handleCategoryChange(category)}
- />
+                            />
                         </Col>
                     ))}
                 </Row>
@@ -128,6 +147,29 @@ const UserPage = () => {
                                         <Link to={`/products/${product.id}`}>{product.name}</Link>
                                     </Card.Title>
                                     <Card.Text>₱{product.price}</Card.Text>
+                                    <Card.Text>
+                                        <strong>Available:</strong> {product.quantity} pieces
+                                    </Card.Text>
+                                    {/* Quantity Selector */}
+                                    <div className="d-flex align-items-center mb-3">
+                                        <Button
+                                            variant="outline-secondary"
+                                            size="sm"
+                                            onClick={() => handleQuantityChange(product.id, 'decrement')}
+                                            disabled={quantities[product.id] === 1}
+                                        >
+                                            -
+                                        </Button>
+                                        <span className="mx-3">{quantities[product.id]}</span>
+                                        <Button
+                                            variant="outline-secondary"
+                                            size="sm"
+                                            onClick={() => handleQuantityChange(product.id, 'increment')}
+                                            disabled={quantities[product.id] >= product.quantity}
+                                        >
+                                            +
+                                        </Button>
+                                    </div>
                                     <Button variant="primary" onClick={() => handleAddToCart(product)}>
                                         Add to Cart
                                     </Button>

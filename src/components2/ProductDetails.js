@@ -42,7 +42,7 @@ const ProductDetails = () => {
           <Card.Title>{product.name}</Card.Title>
           <Card.Text><strong>Description:</strong> {product.description}
           </Card.Text>
-          <Card.Text><strong>Quantity:</strong> {product.quantity}
+          <Card.Text><strong>Available:</strong> {product.quantity} pieces
           </Card.Text>
           <Card.Text><strong>Category:</strong> {product.category}
           </Card.Text>
